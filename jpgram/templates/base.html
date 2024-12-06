@@ -13,6 +13,7 @@
             --color-medium: #3C3D37;
             --color-light: #697565;
             --color-beige: #ECDFCC;
+            --sidebar-width: 250px;
         }
 
         body {
@@ -21,8 +22,12 @@
         }
 
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100%;
             background-color: var(--color-medium);
-            min-height: 100vh;
             padding-top: 2rem;
         }
 
@@ -53,6 +58,7 @@
         }
 
         .main-content {
+            margin-left: var(--sidebar-width);
             padding: 2rem;
         }
 
@@ -108,7 +114,7 @@
             </div>
             <div class="col-md-9 col-lg-10 main-content">
                 <h1 class="text-center mb-5">{% block page_title %}College Magazine{% endblock %}</h1>
-                {% block content %}                {% endblock %}
+                {% block content %} {% endblock %}
             </div>
         </div>
     </div>
