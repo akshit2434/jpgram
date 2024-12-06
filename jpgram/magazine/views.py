@@ -31,11 +31,9 @@ def crescendojiit(request):
 
     if not image_index:
         image_index = fetch_index()
-        logger.debug("Fetched Index: %s", image_index)  # Logging
         cache.set("image_index", image_index, timeout=3600)
 
     image_data_list = image_index.get(club, [])
-    logger.debug("Image Data List for %s: %s", club, image_data_list)  # Logging
 
     return render(
         request, f"magazine/gallery_template.html", {
