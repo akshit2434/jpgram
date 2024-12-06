@@ -141,12 +141,29 @@
         }
 
         @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 80vw;
+                --collapsed-width: 0px;
+            }
+
             .main-content {
                 padding-left: calc(var(--collapsed-width) + 2rem);
             }
 
-            :root {
-                --sidebar-width: 80vw;
+            #sidebar-toggle {
+                width: 50px;
+                height: 50px;
+                background-color: var(--color-medium);
+                transition: transform 0.5s ease;
+            }
+
+            #sidebar-toggle:hover {
+                background-color: var(--color-medium);
+            }
+
+            .sidebar.collapsed #sidebar-toggle {
+                transform: translateX(calc(50px + 2rem));
+                /* color: var(--color-medium); */
             }
         }
     </style>
