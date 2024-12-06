@@ -33,6 +33,7 @@
             background-color: var(--color-medium);
             padding-top: 4rem;
             transition: all 0.3s ease;
+            z-index: 1;
         }
 
         .sidebar h3 {
@@ -72,11 +73,11 @@
         }
 
         .sidebar.collapsed #sidebar-toggle i {
-            transform: rotate(180deg);
+            transform: rotate(-180deg);
         }
 
         .main-content.collapsed {
-            margin-left: var(--collapsed-width);
+            padding-left: calc(var(--collapsed-width) + 2rem);
         }
 
         #sidebar-toggle {
@@ -110,9 +111,10 @@
 
 
         .main-content {
-            margin-left: var(--sidebar-width);
             padding: 2rem;
+            padding-left: calc(var(--sidebar-width) + 2rem);
             transition: all 0.3s ease;
+            width: 100%;
         }
 
         .main-content h1 {
@@ -136,6 +138,16 @@
 
         .article p {
             color: var(--color-dark);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding-left: calc(var(--collapsed-width) + 2rem);
+            }
+
+            :root {
+                --sidebar-width: 80vw;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
