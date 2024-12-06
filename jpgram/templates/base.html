@@ -15,7 +15,7 @@
             --color-medium: #3C3D37;
             --color-light: #697565;
             --color-beige: #ECDFCC;
-            --sidebar-width: 250px;
+            --sidebar-width: 350px;
             --collapsed-width: 50px;
         }
 
@@ -31,7 +31,7 @@
             width: var(--sidebar-width);
             height: 100%;
             background-color: var(--color-medium);
-            padding-top: 4rem;
+            padding: 2rem;
             transition: all 0.3s ease;
             z-index: 1;
         }
@@ -56,6 +56,8 @@
             color: var(--color-beige);
             text-decoration: none;
             transition: color 0.3s ease;
+            display: block;
+            width: 100%;
         }
 
         .sidebar a:hover {
@@ -80,12 +82,20 @@
             padding-left: calc(var(--collapsed-width) + 2rem);
         }
 
+        .t-big {
+            font-size: 38px;
+        }
+
+        h3.t-big {
+            margin-right: 50px;
+        }
+
         #sidebar-toggle {
             background-color: transparent;
             border: none;
             font-size: 24px;
             position: absolute;
-            top: 10px;
+            top: 2rem;
             right: 0;
             padding: 5px;
             display: flex;
@@ -178,7 +188,7 @@
                     <i class="fas fa-chevron-left"></i>
                 </button>
 
-                <h3 class="text-center mb-4">College Hubs</h3>
+                <h3 class="text-center mb-4 t-big">College Hubs</h3>
                 <ul>
                     <li><a href="/magazine/cice_jiit">cice_jiit</a></li>
                     <li><a href="/magazine/crescendojiit">crescendojiit</a></li>
@@ -199,7 +209,7 @@
                 </ul>
             </div>
             <div class="col-md-9 col-lg-10 main-content">
-                <h1 class="text-center mb-5">{% block page_title %}College Magazine{% endblock %}</h1>
+                <h1 class="text-center mb-5 t-big">{% block page_title %}College Magazine{% endblock %}</h1>
                 {% block content %} {% endblock %}
             </div>
         </div>
