@@ -7,12 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}College Magazine{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <style>
         :root {
             --color-dark: #1E201E;
             --color-medium: #3C3D37;
             --color-light: #697565;
             --color-beige: #ECDFCC;
+            --sidebar-width: 350px;
+            --collapsed-width: 50px;
         }
 
         body {
@@ -21,9 +25,15 @@
         }
 
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100%;
             background-color: var(--color-medium);
-            min-height: 100vh;
-            padding-top: 2rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            z-index: 1;
         }
 
         .sidebar h3 {
@@ -46,14 +56,75 @@
             color: var(--color-beige);
             text-decoration: none;
             transition: color 0.3s ease;
+            display: block;
+            width: 100%;
         }
 
         .sidebar a:hover {
             color: var(--color-light);
         }
 
+        .sidebar.collapsed {
+            transform: translateX(calc(-1 * (var(--sidebar-width) - var(--collapsed-width))));
+            padding-right: var(--collapsed-width);
+        }
+
+        .sidebar.collapsed a {
+            color: var(--color-medium);
+            pointer-events: none;
+        }
+
+        .sidebar.collapsed #sidebar-toggle i {
+            transform: rotate(-180deg);
+        }
+
+        .main-content.collapsed {
+            padding-left: calc(var(--collapsed-width) + 2rem);
+        }
+
+        .t-big {
+            font-size: 38px;
+        }
+
+        h3.t-big {
+            margin-right: 50px;
+        }
+
+        #sidebar-toggle {
+            background-color: transparent;
+            border: none;
+            font-size: 24px;
+            position: absolute;
+            top: 2rem;
+            right: 0;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--collapsed-width);
+            height: var(--collapsed-width);
+            color: var(--color-beige);
+        }
+
+        #sidebar-toggle i {
+            transition: all 0.3s ease;
+        }
+
+        #sidebar-toggle i {
+            transform: rotate(0deg);
+        }
+
+
+        #sidebar-toggle:hover {
+            background-color: rgb(53, 53, 53);
+        }
+
+
         .main-content {
             padding: 2rem;
+            padding-left: calc(var(--sidebar-width) + 2rem);
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
         .main-content h1 {
@@ -78,6 +149,33 @@
         .article p {
             color: var(--color-dark);
         }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 80vw;
+                --collapsed-width: 0px;
+            }
+
+            .main-content {
+                padding-left: calc(var(--collapsed-width) + 2rem);
+            }
+
+            #sidebar-toggle {
+                width: 50px;
+                height: 50px;
+                background-color: var(--color-medium);
+                transition: transform 0.5s ease;
+            }
+
+            #sidebar-toggle:hover {
+                background-color: var(--color-medium);
+            }
+
+            .sidebar.collapsed #sidebar-toggle {
+                transform: translateX(calc(50px + 2rem));
+                /* color: var(--color-medium); */
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -86,7 +184,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 col-lg-2 sidebar">
-                <h3 class="text-center mb-4">College Hubs</h3>
+                <button id="sidebar-toggle" class="btn btn-light">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <h3 class="text-center mb-4 t-big">College Hubs</h3>
                 <ul>
                     <li><a href="/magazine/cice_jiit">cice_jiit</a></li>
                     <li><a href="/magazine/crescendojiit">crescendojiit</a></li>
@@ -107,12 +209,18 @@
                 </ul>
             </div>
             <div class="col-md-9 col-lg-10 main-content">
-                <h1 class="text-center mb-5">{% block page_title %}College Magazine{% endblock %}</h1>
-                {% block content %}                {% endblock %}
+                <h1 class="text-center mb-5 t-big">{% block page_title %}College Magazine{% endblock %}</h1>
+                {% block content %} {% endblock %}
             </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebar-toggle').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('collapsed');
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 
