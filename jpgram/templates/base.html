@@ -16,12 +16,31 @@
             --color-light: #697565;
             --color-beige: #ECDFCC;
             --sidebar-width: 350px;
-            --collapsed-width: 50px;
+            --collapsed-width: var(--menubtn-size);
+            --menubtn-size: 50px;
         }
 
         body {
             background-color: var(--color-beige);
             color: var(--color-dark);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--color-medium);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--color-beige);
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: grey;
         }
 
         .sidebar {
@@ -32,8 +51,17 @@
             height: 100%;
             background-color: var(--color-medium);
             padding: 2rem;
+            padding-right: max(2rem, var(--menubtn-size));
+            overflow-y: auto;
+            overflow-x: hidden;
             transition: all 0.3s ease;
             z-index: 1;
+            direction: rtl;
+            will-change: transform;
+        }
+
+        .sidebar * {
+            direction: ltr;
         }
 
         .sidebar h3 {
@@ -66,64 +94,52 @@
 
         .sidebar.collapsed {
             transform: translateX(calc(-1 * (var(--sidebar-width) - var(--collapsed-width))));
-            padding-right: var(--collapsed-width);
         }
 
-        .sidebar.collapsed a {
-            color: var(--color-medium);
-            pointer-events: none;
+
+        #sidebar-toggle.collapsed {
+            left: var(--collapsed-width);
         }
 
-        .sidebar.collapsed #sidebar-toggle i {
+        #sidebar-toggle.collapsed i {
             transform: rotate(-180deg);
-        }
-
-        .main-content.collapsed {
-            padding-left: calc(var(--collapsed-width) + 2rem);
         }
 
         .t-big {
             font-size: 38px;
         }
 
-        h3.t-big {
-            margin-right: 50px;
-        }
-
         #sidebar-toggle {
-            background-color: transparent;
+            background-color: var(--color-medium);
             border: none;
             font-size: 24px;
-            position: absolute;
+            position: fixed;
             top: 2rem;
-            right: 0;
+            left: var(--sidebar-width);
             padding: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: var(--collapsed-width);
-            height: var(--collapsed-width);
+            width: var(--menubtn-size);
+            height: var(--menubtn-size);
             color: var(--color-beige);
+            transition: all 0.3s ease;
+            z-index: 2;
+            transform: translateX(-100%);
         }
 
         #sidebar-toggle i {
             transition: all 0.3s ease;
-        }
-
-        #sidebar-toggle i {
             transform: rotate(0deg);
         }
-
 
         #sidebar-toggle:hover {
             background-color: rgb(53, 53, 53);
         }
 
-
         .main-content {
             padding: 2rem;
-            padding-left: calc(var(--sidebar-width) + 2rem);
-            transition: all 0.3s ease;
+            padding-left: calc(var(--collapsed-width) + 2rem);
             width: 100%;
         }
 
@@ -154,26 +170,24 @@
             :root {
                 --sidebar-width: 80vw;
                 --collapsed-width: 0px;
+                --menubtn-size: 40px;
             }
 
-            .main-content {
-                padding-left: calc(var(--collapsed-width) + 2rem);
+            .t-big {
+                font-size: 28px;
             }
 
             #sidebar-toggle {
-                width: 50px;
-                height: 50px;
                 background-color: var(--color-medium);
-                transition: transform 0.5s ease;
             }
 
             #sidebar-toggle:hover {
                 background-color: var(--color-medium);
             }
 
-            .sidebar.collapsed #sidebar-toggle {
-                transform: translateX(calc(50px + 2rem));
-                /* color: var(--color-medium); */
+            #sidebar-toggle.collapsed {
+                left: 2rem;
+                transform: translateX(0);
             }
         }
     </style>
@@ -183,10 +197,11 @@
 <body>
     <div class="container-fluid">
         <div class="row">
+            <button id="sidebar-toggle" class="btn btn-light">
+                <i class="fas fa-chevron-left"></i>
+            </button>
             <div class="col-md-3 col-lg-2 sidebar">
-                <button id="sidebar-toggle" class="btn btn-light">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
+
 
                 <h3 class="text-center mb-4 t-big">College Hubs</h3>
                 <ul>
@@ -219,6 +234,7 @@
         document.getElementById('sidebar-toggle').addEventListener('click', function () {
             document.querySelector('.sidebar').classList.toggle('collapsed');
             document.querySelector('.main-content').classList.toggle('collapsed');
+            document.querySelector('#sidebar-toggle').classList.toggle('collapsed');
         });
     </script>
     {% block extra_js %}{% endblock %}
