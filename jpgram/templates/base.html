@@ -16,7 +16,8 @@
             --color-light: #697565;
             --color-beige: #ECDFCC;
             --sidebar-width: 350px;
-            --collapsed-width: 50px;
+            --collapsed-width: var(--menubtn-size);
+            --menubtn-size: 50px;
         }
 
         body {
@@ -50,7 +51,7 @@
             height: 100%;
             background-color: var(--color-medium);
             padding: 2rem;
-            padding-right: max(2rem, 50px);
+            padding-right: max(2rem, var(--menubtn-size));
             overflow-y: auto;
             overflow-x: hidden;
             transition: all 0.3s ease;
@@ -119,8 +120,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 50px;
-            height: 50px;
+            width: var(--menubtn-size);
+            height: var(--menubtn-size);
             color: var(--color-beige);
             transition: all 0.3s ease;
             z-index: 2;
@@ -169,11 +170,14 @@
             :root {
                 --sidebar-width: 80vw;
                 --collapsed-width: 0px;
+                --menubtn-size: 40px;
+            }
+
+            .t-big {
+                font-size: 28px;
             }
 
             #sidebar-toggle {
-                width: 50px;
-                height: 50px;
                 background-color: var(--color-medium);
             }
 
