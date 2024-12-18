@@ -36,7 +36,13 @@ def crescendojiit(request):
 
 def gdscjiit(request):
     club = "gdscjiit"
+    image_index = cache.get("image_index")
+
+    if not image_index:
+        image_index = fetch_index()
+        cache.set("image_index", image_index, timeout=3600)
     image_index = fetch_index()
+
     return render(
         request, f"magazine/{club}.html", {"image_data_list": image_index[club]}
     )

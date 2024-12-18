@@ -8,13 +8,16 @@
     <title>{% block title %}College Magazine{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         :root {
-            --color-dark: #1E201E;
-            --color-medium: #3C3D37;
-            --color-light: #697565;
-            --color-beige: #ECDFCC;
+            --color-dark: #2E2E2E;
+            --color-medium: #4A4A4A;
+            --color-light: #A6A6A6;
+            --color-beige: #EAE7DC;
+            /* Updated background color */
+            --color-accent: #cac2b3;
+            /* Updated accent color */
             --sidebar-width: 350px;
             --collapsed-width: var(--menubtn-size);
             --menubtn-size: 50px;
@@ -22,7 +25,10 @@
 
         body {
             background-color: var(--color-beige);
+            /* Updated background color */
             color: var(--color-dark);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -30,11 +36,11 @@
         }
 
         .sidebar::-webkit-scrollbar-track {
-            background: var(--color-medium);
+            background: rgba(0, 0, 0, 0.1);
         }
 
         .sidebar::-webkit-scrollbar-thumb {
-            background-color: var(--color-beige);
+            background-color: #eae7dcb7;
             border-radius: 10px;
             transition: background-color 0.3s ease;
         }
@@ -58,6 +64,7 @@
             z-index: 1;
             direction: rtl;
             will-change: transform;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar * {
@@ -67,7 +74,7 @@
         .sidebar h3 {
             color: var(--color-beige);
             border-bottom: 2px solid var(--color-light);
-            padding-bottom: 0.5rem;
+            padding-bottom: 10px;
             margin-bottom: 1rem;
         }
 
@@ -77,19 +84,28 @@
         }
 
         .sidebar li {
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar a {
+            margin-bottom: 0.3rem;
+            display: flex;
+            flex-direction: row;
             color: var(--color-beige);
             text-decoration: none;
-            transition: color 0.3s ease;
-            display: block;
+            transition: color 0.3s ease, background-color 0.3s ease;
             width: 100%;
+            font-size: 20px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: var(--color-medium);
         }
 
-        .sidebar a:hover {
-            color: var(--color-light);
+        .sidebar li:hover {
+            color: var(--color-dark);
+            background-color: var(--color-accent);
+        }
+
+        .a_before {
+            padding-right: 8px;
+            font-size: 16px;
+            padding-top: 2px;
         }
 
         .sidebar.collapsed {
@@ -98,7 +114,7 @@
 
 
         #sidebar-toggle.collapsed {
-            left: var(--collapsed-width);
+            transform: translateX(calc(var(--collapsed-width) - 100%));
         }
 
         #sidebar-toggle.collapsed i {
@@ -106,7 +122,12 @@
         }
 
         .t-big {
-            font-size: 38px;
+            font-size: 32px;
+            padding: 0.4rem 0;
+        }
+
+        .page-title {
+            font-size: 4rem;
         }
 
         #sidebar-toggle {
@@ -115,7 +136,7 @@
             font-size: 24px;
             position: fixed;
             top: 2rem;
-            left: var(--sidebar-width);
+            left: 0;
             padding: 5px;
             display: flex;
             align-items: center;
@@ -123,18 +144,19 @@
             width: var(--menubtn-size);
             height: var(--menubtn-size);
             color: var(--color-beige);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             z-index: 2;
-            transform: translateX(-100%);
+            transform: translateX(calc(var(--sidebar-width) - 100%));
         }
 
         #sidebar-toggle i {
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             transform: rotate(0deg);
         }
 
         #sidebar-toggle:hover {
-            background-color: rgb(53, 53, 53);
+            background-color: var(--color-accent);
+            color: var(--color-dark);
         }
 
         .main-content {
@@ -146,7 +168,6 @@
         .main-content h1 {
             color: var(--color-medium);
             border-bottom: 3px solid var(--color-light);
-            padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
 
@@ -160,10 +181,12 @@
 
         .article h2 {
             color: var(--color-medium);
+            font-size: 24px;
         }
 
         .article p {
             color: var(--color-dark);
+            font-size: 16px;
         }
 
         @media (max-width: 768px) {
@@ -173,21 +196,33 @@
                 --menubtn-size: 40px;
             }
 
-            .t-big {
+            .t-big,
+            .page-title {
                 font-size: 28px;
+                padding: 0.4rem 0;
             }
 
             #sidebar-toggle {
                 background-color: var(--color-medium);
+                box-shadow: none;
             }
 
             #sidebar-toggle:hover {
                 background-color: var(--color-medium);
+                color: var(--color-beige);
             }
 
             #sidebar-toggle.collapsed {
-                left: 2rem;
-                transform: translateX(0);
+                transform: translateX(calc(2rem));
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar a {
+                font-size: 18px;
+            }
+
+            .a_before {
+                font-size: 14px;
             }
         }
     </style>
@@ -197,35 +232,93 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <button id="sidebar-toggle" class="btn btn-light">
+            <button id="sidebar-toggle" class="collapsed btn btn-light">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <div class="col-md-3 col-lg-2 sidebar">
+            <div class="col-md-3 col-lg-2 sidebar collapsed">
 
 
                 <h3 class="text-center mb-4 t-big">College Hubs</h3>
                 <ul>
-                    <li><a href="/magazine/cice_jiit">cice_jiit</a></li>
-                    <li><a href="/magazine/crescendojiit">crescendojiit</a></li>
-                    <li><a href="/magazine/gdscjiit">gdscjiit</a></li>
-                    <li><a href="/magazine/jaypee.photo.enthusiasts.guild">jaypee.photo.enthusiasts.guild</a></li>
-                    <li><a href="/magazine/jhankaarjiit">jhankaarjiit</a></li>
-                    <li><a href="/magazine/jiit.impressions">jiit.impressions</a></li>
-                    <li><a href="/magazine/jiityouthclub">jiityouthclub</a></li>
-                    <li><a href="/magazine/knuth_jiit">knuth_jiit</a></li>
-                    <li><a href="/magazine/nssjiit62">nssjiit62</a></li>
-                    <li><a href="/magazine/osdcjiit">osdcjiit</a></li>
-                    <li><a href="/magazine/parola.literaryhub">parola.literaryhub</a></li>
-                    <li><a href="/magazine/radiance.hub">radiance.hub</a></li>
-                    <li><a href="/magazine/thejaypeedebsoc">thejaypeedebsoc</a></li>
-                    <li><a href="/magazine/thepageturnersociety">thepageturnersociety</a></li>
-                    <li><a href="/magazine/thethespiancircle">thethespiancircle</a></li>
-                    <li><a href="/magazine/ucrjiit">ucrjiit</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/" title="Home">Home</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/cice_jiit" title="@cice_jiit">CICE JIIT</a>
+                    </li>
+                    <li><span class="a_before">►</span><a href="/magazine/crescendojiit"
+                            title="@crescendojiit">Crescendo JIIT</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/gdscjiit" title="@gdscjiit">GDSC JIIT</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/jaypee.photo.enthusiasts.guild"
+                            title="@jaypee.photo.enthusiasts.guild">Jaypee Photo Enthusiasts Guild</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/jhankaarjiit" title="@jhankaarjiit">Jhankaar
+                            JIIT</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/jiit.impressions"
+                            title="@jiit.impressions">JIIT Impressions</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/jiityouthclub" title="@jiityouthclub">JIIT
+                            Youth Club</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/knuth_jiit" title="@knuth_jiit">Knuth JIIT</a>
+                    </li>
+                    <li><span class="a_before">►</span><a href="/magazine/nssjiit62" title="@nssjiit62">NSS JIIT 62</a>
+                    </li>
+                    <li><span class="a_before">►</span><a href="/magazine/osdcjiit" title="@osdcjiit">OSDC JIIT</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/parola.literaryhub"
+                            title="@parola.literaryhub">Parola Literary Hub</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/radiance.hub" title="@radiance.hub">Radiance
+                            Hub</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/thejaypeedebsoc" title="@thejaypeedebsoc">The
+                            Jaypee DebSoc</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/thepageturnersociety"
+                            title="@thepageturnersociety">The Page Turner
+                            Society</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/thethespiancircle"
+                            title="@thethespiancircle">The Thespian Circle</a></li>
+                    <li><span class="a_before">►</span><a href="/magazine/ucrjiit" title="@ucrjiit">μCR JIIT</a></li>
                 </ul>
             </div>
-            <div class="col-md-9 col-lg-10 main-content">
-                <h1 class="text-center mb-5 t-big">{% block page_title %}College Magazine{% endblock %}</h1>
-                {% block content %} {% endblock %}
+            <div class="col-md-9 col-lg-10 main-content collapsed">
+                <h1 class="text-center mb-5 page-title">{% block page_title %}College Magazine{% endblock %}</h1>
+                {% block content %}
+                <div class="container">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                        {% for item in image_data_list %}
+                        <div class="col">
+                            <div class="card shadow" data-bs-toggle="modal"
+                                data-bs-target="#modal-{{ forloop.counter }}">
+                                <img src="{{ item.image | safe }}" class="card-img-top" alt="Image">
+                                <div class="card-body">
+                                    <p class="card-date">{{ item.datetime }}</p>
+                                    <p class="card-text">{{ item.caption }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal for each card -->
+                        <div class="modal fade" id="modal-{{ forloop.counter }}" tabindex="-1"
+                            aria-labelledby="modalLabel-{{ forloop.counter }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel-{{ forloop.counter }}">{{ item.datetime
+                                            }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="modal-image">
+                                            <img src="{{ item.image | safe }}" class="img-fluid" alt="Image">
+                                        </div>
+                                        <div class="modal-text">
+                                            <p class="mt-3">{{ item.caption }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <p class="text-center">No images available.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endblock %}
             </div>
         </div>
     </div>
