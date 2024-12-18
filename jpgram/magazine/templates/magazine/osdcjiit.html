@@ -175,7 +175,7 @@
         {% for item in image_data_list %}
         <div class="card w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-transform hover:scale-105"
             data-modal-target="#modal-{{ forloop.counter }}">
-            <img src="{{ item.image | safe }}" class="w-full h-64 object-cover" alt="Image">
+            <img src="{{ item.images.0 | safe }}" class="w-full h-64 object-cover" alt="Image">
             <div class="p-4">
                 <h5 class="text-gray-900 mb-2 font-bold">{{ item.title }}</h5>
                 <p class="text-gray-600 text-base truncate-text">{{ item.caption }}</p>
@@ -189,7 +189,7 @@
             <div class="bg-white rounded-lg p-4 relative modal-content">
                 <span class="modal-close" data-modal-close>&times;</span>
                 <div class="flex items-center justify-center modal-image-parent">
-                    <img src="{{ item.image | safe }}" class="modal-image rounded-lg" alt="Image">
+                    <img src="{{ item.images.0 | safe }}" class="modal-image rounded-lg" alt="Image">
                 </div>
                 <div class="w-full flex flex-col justify-center modal-text">
                     <h5 class="modal-title text-gray-900">{{ item.title }}</h5>

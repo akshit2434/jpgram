@@ -34,8 +34,8 @@ def crescendojiit(request):
     )
 
 
-def gdscjiit(request):
-    club = "gdscjiit"
+def dscjiit(request):
+    club = "dscjiit"
     image_index = cache.get("image_index")
 
     if not image_index:
