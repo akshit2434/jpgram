@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Jhankaar Gallery{% endblock %}
+{% block title %}{{title}}{% endblock %}
 {% block extra_css %}
 <style>
     .truncate-text {
@@ -72,6 +72,15 @@
         margin-bottom: 1rem;
     }
 
+    .modal-title i {
+        transition: color 0.3s ease;
+        color: black;
+    }
+
+    .modal-title i:hover {
+        color: #e1306c;
+    }
+
     .modal-caption {
         font-size: 1.25rem;
     }
@@ -83,15 +92,24 @@
     }
 
     .modal-image {
-        width: auto;
+        width: 100%;
         height: 100%;
+        /* max-height: 70vh; */
         object-fit: contain;
-
     }
 
     .modal-image-parent {
         margin-right: 1.5rem;
         height: 100%;
+        overflow: hidden;
+        background-color: var(--color-beige);
+        width: 60vw;
+        /* Fixed width on PC */
+        min-width: 500px;
+        /* Minimum width to ensure visibility */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .modal-text {
@@ -107,7 +125,38 @@
         font-size: 1.25rem;
     }
 
+    .carousel_control_icon_outer {
+        background-color: #2d3748;
+        border-radius: 100vw;
+        height: 80px;
+        width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .carousel-control-next,
+    .carousel-control-prev {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .carousel_control_icon_outer span {
+        padding: 20px;
+    }
+
     @media (max-width: 768px) {
+        .carousel_control_icon_outer {
+            width: unset;
+        }
+
+        .carousel-control-next,
+        .carousel-control-prev {
+            display: block !important;
+        }
+
         .modal-content {
             max-height: 90vh;
             max-width: 95vw;
@@ -151,6 +200,7 @@
 
         .modal-image-parent {
             width: 100%;
+            min-width: unset;
             max-height: 50vh;
             margin-right: 0;
             margin-bottom: 1rem;
@@ -168,7 +218,7 @@
     }
 </style>
 {% endblock %}
-{% block page_title %}Jhankaar{% endblock %}
+{% block page_title %}{{page_title}}{% endblock %}
 {% block content %}
 <div class="container mx-auto my-5">
     <div class="flex flex-wrap justify-center gap-4">
@@ -188,11 +238,40 @@
             id="modal-{{ forloop.counter }}">
             <div class="bg-white rounded-lg p-4 relative modal-content">
                 <span class="modal-close" data-modal-close>&times;</span>
-                <div class="flex items-center justify-center modal-image-parent">
-                    <img src="{{ item.images.0 | safe }}" class="modal-image rounded-lg" alt="Image">
+                <!-- <div class="flex items-center justify-center  rounded-lg"> -->
+                <div id="carousel-{{ forloop.counter }}" class="modal-image-parent carousel slide"
+                    data-bs-ride="carousel">
+                    <div class="carousel-inner h-100">
+                        {% for image in item.images %}
+                        <div class="carousel-item h-100 {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image | safe }}" class="d-block modal-image rounded-lg" alt="Image">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev carousel-control" type="button"
+                        data-bs-target="#carousel-{{ forloop.counter }}" data-bs-slide="prev">
+                        <div class="carousel_control_icon_outer"> <span class="carousel-control-prev-icon"
+                                aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </div>
+
+                    </button>
+                    <button class="carousel-control-next carousel-control" type="button"
+                        data-bs-target="#carousel-{{ forloop.counter }}" data-bs-slide="next">
+                        <div class="carousel_control_icon_outer"><span class="carousel-control-next-icon"
+                                aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </div>
+
+                    </button>
                 </div>
+                <!-- </div> -->
                 <div class="w-full flex flex-col justify-center modal-text">
-                    <h5 class="modal-title text-gray-900">{{ item.title }}</h5>
+                    <h5 class="modal-title text-gray-900">{{ item.title }}<a href="{{ item.url }}" target="_blank"
+                            class="ml-2">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a></h5>
+
                     <p class="modal-caption text-gray-600">{{ item.caption }}</p>
                     <span class="read-more" onclick="toggleReadMore(this)">Read more</span>
                     <p class="modal-date text-gray-500">{{ item.datetime }}</p>
@@ -207,7 +286,18 @@
         card.addEventListener('click', () => {
             const modal = document.querySelector(card.getAttribute('data-modal-target'));
             modal.classList.remove('hidden');
-            //document.body.classList.add('modal-open');
+
+            // Check carousel items and toggle controls
+            const carouselId = modal.querySelector('.carousel').id;
+            const carouselItems = modal.querySelectorAll('.carousel-item');
+            const carouselControls = modal.querySelectorAll('.carousel-control');
+
+            if (carouselItems.length <= 1) {
+                carouselControls.forEach(control => control.style.display = 'none');
+            } else {
+                carouselControls.forEach(control => control.style.display = 'block');
+            }
+
             setTimeout(() => {
                 modal.classList.add('show');
             }, 10);
