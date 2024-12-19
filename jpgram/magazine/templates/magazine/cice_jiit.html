@@ -494,7 +494,7 @@
     }
 
     // Store all items data
-    const allItems = {{ image_data_list| safe }};
+    const allItems = JSON.parse(`{{ image_data_list|safe|escapejs }}`);
     let currentIndex = 6;
     const itemsPerLoad = 6;
 
@@ -582,8 +582,6 @@
             isLoading = false;
             loadingSpinner.style.display = 'none';
 
-            // Initialize event handlers on new content
-            // initializeModalHandlers();
             initializeImageHandlers();
             initializeCaptionHandlers();
         }, 300);
@@ -613,19 +611,5 @@
             }
         }, 100);
     });
-
-    // Helper function to initialize modal handlers for new cards
-    // function initializeModalHandlers() {
-    //     document.querySelectorAll('[data-modal-target]').forEach(card => {
-    //         card.addEventListener('click', () => card_click(card));
-    //     });
-
-    //     document.querySelectorAll('[data-modal-close]').forEach(button => {
-    //         button.addEventListener('click', () => {
-    //             const modal = button.closest('.modal');
-    //             close_modal(modal);
-    //         });
-    //     });
-    // }
 </script>
 {% endblock %}
