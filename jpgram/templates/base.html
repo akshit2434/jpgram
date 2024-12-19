@@ -18,7 +18,7 @@
             /* Updated background color */
             --color-accent: #cac2b3;
             /* Updated accent color */
-            --sidebar-width: 350px;
+            --sidebar-width: 450px;
             --collapsed-width: var(--menubtn-size);
             --menubtn-size: 50px;
         }
@@ -187,6 +187,24 @@
         .article p {
             color: var(--color-dark);
             font-size: 16px;
+        }
+
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--color-medium);
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: var(--color-dark);
         }
 
         @media (max-width: 768px) {
