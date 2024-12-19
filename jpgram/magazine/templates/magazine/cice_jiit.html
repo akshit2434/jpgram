@@ -14,10 +14,13 @@
     .modal {
         opacity: 0;
         transition: opacity 0.3s ease;
+        z-index: 1000;
+        pointer-events: none;
     }
 
     .modal.show {
         opacity: 1;
+        pointer-events: auto;
     }
 
     .modal-content {
@@ -33,6 +36,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        z-index: 1001;
     }
 
     .modal.show .modal-content {
@@ -216,10 +220,10 @@
     }
 
     body.modal-open {
-        overflow: hidden;
+        /*overflow: hidden;
         height: 100vh;
         position: fixed;
-        width: 100%;
+        width: 100%;*/
     }
 
     .load-more-btn {
@@ -323,19 +327,18 @@
         });
     });
 
-    function card_click(e) {
-        const modal = document.querySelector(e.getAttribute('data-modal-target'));
+    function card_click(card) {
+        const modalId = card.dataset.modalTarget;
+        const modal = document.querySelector(modalId);
         modal.classList.remove('hidden');
         document.body.classList.add('modal-open');
 
-        // Check if only single image, hide buttons if so
+        // Check carousel items and toggle controls
         const carouselItems = modal.querySelectorAll('.carousel-item');
         const carouselControls = modal.querySelectorAll('.carousel-control');
 
         if (carouselItems.length <= 1) {
             carouselControls.forEach(control => control.style.display = 'none');
-        } else {
-            carouselControls.forEach(control => control.style.display = 'flex');
         }
 
         setTimeout(() => {
@@ -343,15 +346,22 @@
         }, 10);
     }
 
+    function close_modal(modal) {
+
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+
+    }
+
     // Handle modal close
     document.querySelectorAll('[data-modal-close]').forEach(button => {
         button.addEventListener('click', () => {
             const modal = button.closest('.modal');
-            modal.classList.remove('show');
-            document.body.classList.remove('modal-open');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            close_modal(modal);
         });
     });
 
@@ -359,11 +369,7 @@
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             const modal = e.target;
-            modal.classList.remove('show');
-            document.body.classList.remove('modal-open');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            close_modal(modal)
         }
     });
 
@@ -381,15 +387,36 @@
 
     // Show read more if caption is truncated
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.modal-caption').forEach(caption => {
-            if (caption.scrollHeight > caption.clientHeight) {
-                caption.nextElementSibling.style.display = 'inline';
-            }
-        });
+        // initializeModalHandlers();
+        initializeImageHandlers();
+        initializeCaptionHandlers();
     });
 
-    // Handle image zoom
-    document.addEventListener('DOMContentLoaded', () => {
+    // Use event delegation for modal open and close
+    document.addEventListener('click', (event) => {
+        // Handle modal open
+        const card = event.target.closest('[data-modal-target]');
+        if (card) {
+            event.preventDefault();
+            card_click(card);
+        }
+
+        // Handle modal close
+        if (event.target.matches('[data-modal-close], [data-modal-close] *')) {
+            event.preventDefault();
+            const modal = event.target.closest('.modal');
+            close_modal(modal);
+        }
+
+        // Close modal when clicking outside
+        if (event.target.classList.contains('modal')) {
+            event.preventDefault();
+            close_modal(event.target);
+        }
+    });
+
+    // Define the initializeImageHandlers function
+    function initializeImageHandlers() {
         const images = document.querySelectorAll('.modal-image');
 
         images.forEach(img => {
@@ -413,18 +440,18 @@
             });
 
             // Reset zoom on carousel slide change
-            img.closest('.carousel').addEventListener('slide.bs.carousel', () => {
-                requestAnimationFrame(() => {
-                    img.style.transformOrigin = 'center';
-                    img.classList.remove('zoomed');
+            const carousel = img.closest('.carousel');
+            if (carousel) {
+                carousel.addEventListener('slide.bs.carousel', () => {
+                    requestAnimationFrame(() => {
+                        img.style.transformOrigin = 'center';
+                        img.classList.remove('zoomed');
+                    });
                 });
-            });
-        });
+            }
 
-        // Handle double tap zoom for mobile
-        images.forEach(img => {
+            // Handle double tap zoom for mobile
             let lastTouchStart = 0;
-
             img.addEventListener('touchstart', (e) => {
                 const now = Date.now();
                 if (now - lastTouchStart < 300) {
@@ -435,7 +462,7 @@
                     const y = (touch.clientY - rect.top) / rect.height * 100;
 
                     if (img.classList.contains('zoomed')) {
-                        img.style.transformOrigin = '';
+                        img.style.transformOrigin = 'center';
                         img.classList.remove('zoomed');
                     } else {
                         img.style.transformOrigin = `${x}% ${y}%`;
@@ -445,7 +472,26 @@
                 lastTouchStart = now;
             });
         });
-    });
+    }
+
+    // Define the initializeCaptionHandlers function
+    function initializeCaptionHandlers() {
+        document.querySelectorAll('.modal-caption').forEach(caption => {
+            // Remove existing 'Read more' button if it exists
+            const existingReadMore = caption.nextElementSibling;
+            if (existingReadMore && existingReadMore.classList.contains('read-more')) {
+                existingReadMore.remove();
+            }
+
+            if (caption.scrollHeight > caption.clientHeight) {
+                const readMoreButton = document.createElement('span');
+                readMoreButton.classList.add('read-more');
+                readMoreButton.textContent = 'Read more';
+                readMoreButton.onclick = () => toggleReadMore(readMoreButton);
+                caption.parentNode.insertBefore(readMoreButton, caption.nextSibling);
+            }
+        });
+    }
 
     // Store all items data
     const allItems = {{ image_data_list| safe }};
@@ -536,8 +582,10 @@
             isLoading = false;
             loadingSpinner.style.display = 'none';
 
-            // Reinitialize modal handlers for new cards
-            initializeModalHandlers();
+            // Initialize event handlers on new content
+            // initializeModalHandlers();
+            initializeImageHandlers();
+            initializeCaptionHandlers();
         }, 300);
     };
 
@@ -567,14 +615,17 @@
     });
 
     // Helper function to initialize modal handlers for new cards
-    function initializeModalHandlers() {
-        document.querySelectorAll('[data-modal-target]').forEach(card => {
-            card.removeEventListener('click', () => card_click(card));
-            card.addEventListener('click', () => card_click(card));
-        });
+    // function initializeModalHandlers() {
+    //     document.querySelectorAll('[data-modal-target]').forEach(card => {
+    //         card.addEventListener('click', () => card_click(card));
+    //     });
 
-        // Re-initialize image zoom handlers for new cards
-        initializeImageZoom();
-    }
+    //     document.querySelectorAll('[data-modal-close]').forEach(button => {
+    //         button.addEventListener('click', () => {
+    //             const modal = button.closest('.modal');
+    //             close_modal(modal);
+    //         });
+    //     });
+    // }
 </script>
 {% endblock %}
