@@ -494,7 +494,7 @@
     }
 
     // Store all items data
-    const allItems = JSON.parse(`{{ image_data_list|safe|escapejs }}`);
+    const allItems = {{ image_data_list| safe }};
     let currentIndex = 6;
     const itemsPerLoad = 6;
 
