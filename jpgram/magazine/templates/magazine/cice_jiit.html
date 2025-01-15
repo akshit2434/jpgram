@@ -71,6 +71,7 @@
         font-size: 3rem;
         font-weight: bold;
         margin-bottom: 1rem;
+        line-height: 1.2;
     }
 
     .modal-title i {
@@ -124,12 +125,14 @@
         max-width: 50%;
         padding-left: 1rem;
         width: 500px;
+        overflow-y: auto;
+        max-height: 100%;
     }
 
     .read-more {
         color: blue;
         cursor: pointer;
-        display: none;
+        /*display: none;*/
         font-size: 1.25rem;
     }
 
@@ -152,6 +155,18 @@
 
     .carousel_control_icon_outer span {
         padding: 20px;
+    }
+
+    .modal-caption {
+        display: -webkit-box;
+        -webkit-line-clamp: 9;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .modal-caption.expanded {
+        -webkit-line-clamp: unset;
     }
 
     @media (max-width: 768px) {
@@ -304,13 +319,13 @@
                         </div>
                     </button>
                 </div>
-                <div class="w-full flex flex-col justify-center modal-text">
+                <div class="w-full flex-col justify-center modal-text">
                     <h5 class="modal-title text-gray-900">{{ item.title }}<a href="{{ item.url }}" target="_blank"
                             class="ml-2">
                             <i class="fa-brands fa-instagram"></i>
                         </a></h5>
                     <p class="modal-caption text-gray-600">{{ item.caption }}</p>
-                    <span class="read-more" onclick="toggleReadMore(this)">Read more</span>
+                     <span class="read-more">Read more</span>
                     <p class="modal-date text-gray-500">{{ item.datetime }}</p>
                 </div>
             </div>
@@ -357,22 +372,6 @@
 
     }
 
-    // Handle modal close
-    document.querySelectorAll('[data-modal-close]').forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = button.closest('.modal');
-            close_modal(modal);
-        });
-    });
-
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            const modal = e.target;
-            close_modal(modal)
-        }
-    });
-
     // Toggle read more/less
     function toggleReadMore(element) {
         const caption = element.previousElementSibling;
@@ -390,29 +389,6 @@
         // initializeModalHandlers();
         initializeImageHandlers();
         initializeCaptionHandlers();
-    });
-
-    // Use event delegation for modal open and close
-    document.addEventListener('click', (event) => {
-        // Handle modal open
-        const card = event.target.closest('[data-modal-target]');
-        if (card) {
-            event.preventDefault();
-            card_click(card);
-        }
-
-        // Handle modal close
-        if (event.target.matches('[data-modal-close], [data-modal-close] *')) {
-            event.preventDefault();
-            const modal = event.target.closest('.modal');
-            close_modal(modal);
-        }
-
-        // Close modal when clicking outside
-        if (event.target.classList.contains('modal')) {
-            event.preventDefault();
-            close_modal(event.target);
-        }
     });
 
     // Define the initializeImageHandlers function
@@ -474,24 +450,25 @@
         });
     }
 
-    // Define the initializeCaptionHandlers function
-    function initializeCaptionHandlers() {
-        document.querySelectorAll('.modal-caption').forEach(caption => {
-            // Remove existing 'Read more' button if it exists
-            const existingReadMore = caption.nextElementSibling;
-            if (existingReadMore && existingReadMore.classList.contains('read-more')) {
-                existingReadMore.remove();
-            }
+   // Debounce utility function
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 
-            if (caption.scrollHeight > caption.clientHeight) {
-                const readMoreButton = document.createElement('span');
-                readMoreButton.classList.add('read-more');
-                readMoreButton.textContent = 'Read more';
-                readMoreButton.onclick = () => toggleReadMore(readMoreButton);
-                caption.parentNode.insertBefore(readMoreButton, caption.nextSibling);
-            }
-        });
-    }
+function initializeCaptionHandlers() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        handleModalCaption(modal);
+        customizeModal(modal);
+    });
+}
 
     // Store all items data
     const allItems = {{ image_data_list| safe }};
@@ -540,13 +517,13 @@
                             </div>
                         </button>
                     </div>
-                    <div class="w-full flex flex-col justify-center modal-text">
+                    <div class="w-full flex-col justify-center modal-text">
                         <h5 class="modal-title text-gray-900">${item.title}<a href="${item.url}" target="_blank"
                                 class="ml-2">
                                 <i class="fa-brands fa-instagram"></i>
                             </a></h5>
                         <p class="modal-caption text-gray-600">${item.caption}</p>
-                        <span class="read-more" onclick="toggleReadMore(this)">Read more</span>
+                        <span class="read-more">Read more</span>
                         <p class="modal-date text-gray-500">${item.datetime}</p>
                     </div>
                 </div>
@@ -575,7 +552,12 @@
             const newItems = allItems.slice(currentIndex, currentIndex + itemsPerLoad);
 
             newItems.forEach((item, index) => {
-                galleryContainer.insertAdjacentHTML('beforeend', generateCardHTML(item, currentIndex + index + 1));
+                const html = generateCardHTML(item, currentIndex + index + 1);
+                galleryContainer.insertAdjacentHTML('beforeend', html);
+                const card = galleryContainer.lastElementChild.previousElementSibling;
+                const newModal = card.nextElementSibling;
+                handleModalCaption(newModal);
+                customizeModal(newModal);
             });
 
             currentIndex += itemsPerLoad;
@@ -584,7 +566,7 @@
 
             initializeImageHandlers();
             initializeCaptionHandlers();
-        }, 300);
+        }, 100);
     };
 
     // Create and setup intersection observer
@@ -611,5 +593,98 @@
             }
         }, 100);
     });
+
+    // Core event delegation setup
+    document.addEventListener('DOMContentLoaded', () => {
+        const galleryContainer = document.getElementById('gallery-container');
+        
+        // Handle all card and modal interactions
+        document.addEventListener('click', (e) => {
+            // Card click - open modal
+            const card = e.target.closest('[data-modal-target]');
+            if (card) {
+                const modalId = card.dataset.modalTarget;
+                const modal = document.querySelector(modalId);
+                if (modal) {
+                    card_click(card);
+                    handleModalCaption(modal);
+                }
+            }
+
+            // Close modal
+            if (e.target.matches('[data-modal-close]')) {
+                const modal = e.target.closest('.modal');
+                close_modal(modal);
+            }
+
+             if (e.target.classList.contains('modal')) {
+                const modal = e.target;
+                close_modal(modal)
+            }
+
+            // Read more toggle
+            if (e.target.matches('.read-more')) {
+                toggleReadMore(e.target);
+            }
+        });
+    });
+
+    function shouldShowReadMore(caption) {
+        // Store original styles
+        const originalLineClamp = caption.style.webkitLineClamp;
+        const originalOverflow = caption.style.overflow;
+        
+        // Set line clamp and measure
+        caption.style.webkitLineClamp = originalLineClamp;
+        caption.style.overflow = 'hidden';
+        
+        // Get line height and total height
+        const lineHeight = parseInt(window.getComputedStyle(caption).lineHeight);
+        const maxHeight = lineHeight * parseInt(window.getComputedStyle(caption).webkitLineClamp);
+        const hasOverflow = caption.scrollHeight > maxHeight;
+
+        // Restore original styles
+        caption.style.webkitLineClamp = originalLineClamp;
+        caption.style.overflow = originalOverflow;
+        
+        return hasOverflow;
+    }
+
+    function handleModalCaption(modal) {
+        const caption = modal.querySelector('.modal-caption');
+        if (!caption) return;
+
+        const existingButton = modal.querySelector('.read-more');
+        if (existingButton) existingButton.remove();
+
+        if (shouldShowReadMore(caption)) {
+            const readMoreButton = document.createElement('span');
+            readMoreButton.className = 'read-more';
+            readMoreButton.textContent = 'Read more';
+            caption.parentNode.insertBefore(readMoreButton, caption.nextSibling);
+        }
+    }
+
+    function customizeModal(modal){
+        const imageParent = modal.querySelector('.modal-image-parent');
+        const carouselInner = imageParent.querySelector('.carousel-inner');
+        if (carouselInner && carouselInner.children.length === 1) {
+            if (imageParent) {
+                imageParent.style.width = 'auto';
+            }
+        }
+    }
+
+     // Toggle read more/less
+    function toggleReadMore(element) {
+        const caption = element.previousElementSibling;
+        if (caption.classList.contains('expanded')) {
+            caption.classList.remove('expanded');
+            element.textContent = 'Read more';
+        } else {
+            caption.classList.add('expanded');
+            element.textContent = 'Read less';
+        }
+    }
 </script>
 {% endblock %}
